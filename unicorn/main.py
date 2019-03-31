@@ -12,8 +12,8 @@ vertices = []
 colors = []
 indices = []
 
-width = 800
-height = 800
+width = 1200
+height = 900
 
 buffers = None
 shader = None
