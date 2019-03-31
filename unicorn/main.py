@@ -10,14 +10,10 @@ import random
 
 vertices = []
 colors = []
-indices = [ 
-            0, 3, 4, 
-            0, 1, 3, 
-            1, 2, 3
-          ]
+indices = []
 
-width = 600
-height = 600
+width = 800
+height = 800
 
 buffers = None
 shader = None
@@ -147,7 +143,7 @@ def draw_pentagon():
     draw_vbo()
     shader.end()
 
-def add_point(x, y, z, color):
+def add_point(x, y, z, color, i):
     vertices.append(x)
     vertices.append(y)
     vertices.append(z)
@@ -156,22 +152,28 @@ def add_point(x, y, z, color):
     colors.append(color[1])
     colors.append(color[2])
 
+    indices.append(i)
+
 def load_data():
     with open("input.json") as json_file:
         data = json.load(json_file)
+        i = 0
 
         for key,value in data.items():
-            points = value['point']
-            x = float(points[0])
-            y = float(points[1])
+            for key,points in value.items():
+                x = float(points[0])
+                y = float(points[1])
 
-            width_control = width / 2
-            height_control = height / 2
+                width_control = width / 2
+                height_control = height / 2
 
-            x = (x - width_control) / width_control
-            y = (y - height_control) / height_control
+                x = (x - width_control) / width_control
+                y = (y - height_control) / height_control
+                
+                point_color = [random.random(), random.random(), random.random()]
 
-            add_point(x, y, 0.0, value['colors'])
+                add_point(x, y, 0.0, point_color, i)
+                i = i + 1
 
 if __name__=="__main__":
     load_data()
