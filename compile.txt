@@ -1,0 +1,2 @@
+g++ -c -o main.o main.cpp -I"C:\Program Files (x86)\mingw-w64\i686-8.1.0-posix-dwarf-rt_v6-rev0\mingw32\i686-w64-mingw32\include"
+g++ -o main.exe main.o -L"C:\Program Files (x86)\mingw-w64\i686-8.1.0-posix-dwarf-rt_v6-rev0\mingw32\i686-w64-mingw32\lib" -lfreeglut -lopengl32

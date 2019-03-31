@@ -1,11 +1,12 @@
-#include <GL/glut.h>
+#include "GL/gl.h"
+#include "GL/freeglut.h"
 #include <math.h>
 
 
 void displayPentagon()
 {
     int v;
-    // float pent[6][2];
+    float pent[6][2];
 
     // float ang, da = 6.2832 / 5.0;
 
