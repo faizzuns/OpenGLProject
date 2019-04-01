@@ -179,8 +179,8 @@ def load_data():
                 width_control = width / 2
                 height_control = height / 2
 
-                x = (x - width_control) / width_control
-                y = (y - height_control) / height_control
+                x = (x - width_control) / (width_control + 250)
+                y = (height_control - y) / (height_control + 250)
 
                 point_color = [random.random(), random.random(),
                                random.random()]
@@ -194,7 +194,7 @@ if __name__ == "__main__":
     glutInit(sys.argv)
     glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH)
     glutInitWindowSize(width, height)
-    glutCreateWindow("Pentagon")
+    glutCreateWindow("02. Unicorn")
     glutDisplayFunc(disp_func)
     glutIdleFunc(disp_func)
     glutReshapeFunc(reshape_func)

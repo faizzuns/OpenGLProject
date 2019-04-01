@@ -14,9 +14,9 @@ with open('input.json', 'w') as f:
     i = 0
     for x in range(0, len(li), 6):
         data[i] = {}
-        data[i][0] = [1230-li[x], 1025-li[x+1]]
-        data[i][1] = [1230-li[x+2], 1025-li[x+3]]
-        data[i][2] = [1230-li[x+4], 1025-li[x+5]]
+        data[i][0] = [li[x], li[x+1]]
+        data[i][1] = [li[x+2], li[x+3]]
+        data[i][2] = [li[x+4], li[x+5]]
         i = i + 1
 
     json.dump(data, f)
