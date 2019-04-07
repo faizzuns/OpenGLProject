@@ -16,6 +16,9 @@ import json
 import random
 import threading
 import msvcrt
+from copy import deepcopy
+from time import sleep
+from math import cos, sin, radians
 
 vertices = []
 colors = []
@@ -27,8 +30,8 @@ height = 1050
 buffers = None
 shader = None
 
-# axis = [1, 0, 0]
-# theta = 0.5
+fps = 24
+theta = 20      # in degrees
 
 
 class Shader(object):
@@ -87,6 +90,7 @@ def printOpenGLError():
 
 
 def create_vbo():
+    global vertices
     buffers = glGenBuffers(3)
     glBindBuffer(GL_ARRAY_BUFFER, buffers[0])
     glBufferData(GL_ARRAY_BUFFER,
@@ -139,7 +143,8 @@ def draw():
 
     draw_pentagon()
 
-    glFlush()
+    # glFlush()
+    # glutSwapBuffers()
 
 
 def draw_pentagon():
@@ -179,7 +184,7 @@ def add_point(x, y, z, color, i):
 
 
 def load_data():
-    with open("input.json") as json_file:
+    with open("input_unicorn.json") as json_file:
         data = json.load(json_file)
         i = 0
 
@@ -209,15 +214,35 @@ def main_opengl():
     glutDisplayFunc(disp_func)
     glutIdleFunc(disp_func)
     glutReshapeFunc(reshape_func)
+
+    glutTimerFunc(0, timer, 0)
+    
     initialize()
     glutMainLoop()
 
+def timer(integer):
+    global fps
+    glutPostRedisplay()
+    glutTimerFunc(1000//fps, timer, 0)
+    rotate3d()
+    printVertices()
 
-# def M(axis, theta):
-#     global vertices
-#     M0 = expm(cross(eye(3), axis/norm(axis)*theta))
-#     print(dot(M0, vertices))
-#     # theta += 0.5
+def rotate3d():
+    global vertices, fps
+    local_vertices = [0 for _ in range(len(vertices))]
+    rad = radians(theta)
+    m = [
+        [cos(rad), 0, sin(rad)],
+        [0, 1, 0],
+        [-sin(rad), 0, cos(rad)]
+    ]
+    for i in range(0, len(vertices), 3):
+        local_vertices[i], local_vertices[i+1], local_vertices[i+2] = dot(m, vertices[i:i+3])
+    vertices = deepcopy(local_vertices)
+    sleep(1//fps)
+
+def printVertices():
+    print(vertices[0], vertices[1], vertices[2])
 
 
 if __name__ == "__main__":
@@ -228,8 +253,7 @@ if __name__ == "__main__":
     t.daemon = True
     t.start()
 
-    # # 3d rotation
-    # M(axis, theta)
+    # rotate3d()
 
     # reading key presses (only works in Windows)
     while True:
