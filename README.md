@@ -10,7 +10,9 @@ This project is built on **Python3** and tested in **Windows OS**.
     *Note: amd64 is for 64-bit. Files without amd64 if for 32-bit.*
 
 2. Install or update **pip**
-3. Run `pip install <your_pyopengl_whl_file>`
-4. Run `pip install <your_pyopengl_accelarate_whl_file>`
-5. Run `pip install numpy`
-6. Run `pip install scipy`
+3. `pip install <your_pyopengl_whl_file>`
+4. `pip install <your_pyopengl_accelarate_whl_file>`
+5. `pip install numpy`
+6. `pip install scipy`
+7. `pip install PyGLM`
+8. `python main.py`

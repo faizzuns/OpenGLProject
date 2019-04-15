@@ -10,6 +10,7 @@ from OpenGL.GLUT import *
 
 from numpy import cross, eye, dot
 from scipy.linalg import expm, norm
+import glm
 
 import sys
 import json
@@ -19,49 +20,63 @@ import msvcrt
 from copy import deepcopy
 from time import sleep
 from math import cos, sin, radians
+from time import time
 
 vertices = []
 colors = []
 indices = []
 
-width = 1300
-height = 1050
+width = 1200
+height = 1000
 
-buffers = None
+vao = None          # vertex array object
+buffers = None      # 3D vbo
 shader = None
 
 fps = 24
-theta = 20      # in degrees
+theta = 20          # in degrees
+
+# setting up camera vectors
+camera_position = glm.vec3(0.0, 0.0, 3.0)
+camera_target = glm.vec3(0.0, 0.0, 0.0)
+camera_direction = glm.normalize(camera_position - camera_target)   # actually negative of actual camera direction
+up_vector = glm.vec3(0.0, 1.0, 0.0)
+camera_right = glm.normalize(glm.cross(up_vector, camera_direction))
+camera_up = glm.cross(camera_direction, camera_right)
 
 
 class Shader(object):
 
     def initShader(self, vertex_shader_source, fragment_shader_source):
-        # create program
-        self.program = glCreateProgram()
-        printOpenGLError()
         # vertex shader
         self.vs = glCreateShader(GL_VERTEX_SHADER)
         glShaderSource(self.vs, [vertex_shader_source])
         glCompileShader(self.vs)
-        glAttachShader(self.program, self.vs)
         printOpenGLError()
         # fragment shader
         self.fs = glCreateShader(GL_FRAGMENT_SHADER)
         glShaderSource(self.fs, [fragment_shader_source])
         glCompileShader(self.fs)
+        printOpenGLError()
+        # shader program
+        self.program = glCreateProgram()
+        glAttachShader(self.program, self.vs)
         glAttachShader(self.program, self.fs)
         printOpenGLError()
-
         glLinkProgram(self.program)
         printOpenGLError()
+        self.uniform_loc = glGetUniformLocation(self.program, 'mvp_matrix')
 
     def begin(self):
         if glUseProgram(self.program):
             printOpenGLError()
 
-    def end(self):
-        glUseProgram(0)
+    def use(self):
+        # glUseProgram(0)
+        glUseProgram(self.program)
+
+    # def setMat4(self, mat):
+    #     glUniformMatrix4fv(self.uniform_loc, 1, GL_FALSE, mat)
 
 
 def initialize():
@@ -91,26 +106,27 @@ def printOpenGLError():
 
 def create_vbo():
     global vertices
-    buffers = glGenBuffers(3)
-    glBindBuffer(GL_ARRAY_BUFFER, buffers[0])
+    vbo = glGenBuffers(3)
+    glBindBuffer(GL_ARRAY_BUFFER, vbo[0])
     glBufferData(GL_ARRAY_BUFFER,
                  len(vertices)*4,  # byte size
                  (ctypes.c_float*len(vertices))(*vertices),
-                 GL_STATIC_DRAW)
-    glBindBuffer(GL_ARRAY_BUFFER, buffers[1])
+                 GL_STREAM_DRAW)
+    glBindBuffer(GL_ARRAY_BUFFER, vbo[1])
     glBufferData(GL_ARRAY_BUFFER,
                  len(colors)*4,  # byte size
                  (ctypes.c_float*len(colors))(*colors),
-                 GL_STATIC_DRAW)
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers[2])
+                 GL_STREAM_DRAW)
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[2])
     glBufferData(GL_ELEMENT_ARRAY_BUFFER,
                  len(indices)*4,  # byte size
                  (ctypes.c_uint*len(indices))(*indices),
-                 GL_STATIC_DRAW)
-    return buffers
+                 GL_STREAM_DRAW)
+    return vbo
 
 
 def draw_vbo():
+    global buffers
     glEnableClientState(GL_VERTEX_ARRAY)
     glEnableClientState(GL_COLOR_ARRAY)
     glBindBuffer(GL_ARRAY_BUFFER, buffers[0])
@@ -119,8 +135,8 @@ def draw_vbo():
     glColorPointer(3, GL_FLOAT, 0, None)
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers[2])
     glDrawElements(GL_TRIANGLES, len(indices), GL_UNSIGNED_INT, None)
-    glDisableClientState(GL_COLOR_ARRAY)
-    glDisableClientState(GL_VERTEX_ARRAY)
+    # glDisableClientState(GL_COLOR_ARRAY)
+    # glDisableClientState(GL_VERTEX_ARRAY)
 
 
 def reshape_func(w, h):
@@ -133,42 +149,46 @@ def disp_func():
 
 
 def draw():
-    global yaw, pitch
+    # global yaw, pitch
     # clear
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     # view
     glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
     glTranslatef(0.0, 0.0, -2.0)
-
     draw_pentagon()
-
-    # glFlush()
-    # glutSwapBuffers()
 
 
 def draw_pentagon():
-    global shader, buffers
+    global shader, buffers, vao
+    vao = glGenVertexArrays(1)
+    glBindVertexArray(vao)
+    
     if shader == None:
         shader = Shader()
-        shader.initShader('''
+        shader.initShader(
+        '''
             void main()
             {
                 gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
                 gl_FrontColor = gl_Color;
             }
         ''',
-                          '''
+        '''
             void main()
             {
                 gl_FragColor = gl_Color;
             }
         ''')
+        # print(shader)
         buffers = create_vbo()
 
     shader.begin()
+    shader.use()
+    glBindVertexArray(vao)
     draw_vbo()
-    shader.end()
+    rotateObj()
+    # glBindVertexArray(0)
 
 
 def add_point(x, y, z, color, i):
@@ -206,6 +226,17 @@ def load_data():
                 i = i + 1
 
 
+def rotateObj():
+    global shader
+    view = glm.mat4(1.0)      # make sure to initialize matrix to identity matrix first
+    radius = 10.0
+    camX = sin(time()) * radius
+    camZ = cos(time()) * radius
+    view = glm.lookAt(glm.vec3(camX, 0.0, camZ), glm.vec3(0.0, 0.0, 0.0), glm.vec3(0.0, 1.0, 0.0))
+    # print(shader)
+    # shader.setMat4(view)
+
+
 def main_opengl():
     glutInit(sys.argv)
     glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH)
@@ -214,18 +245,13 @@ def main_opengl():
     glutDisplayFunc(disp_func)
     glutIdleFunc(disp_func)
     glutReshapeFunc(reshape_func)
-
-    glutTimerFunc(0, timer, 0)
-    
     initialize()
     glutMainLoop()
 
-def timer(integer):
-    global fps
-    glutPostRedisplay()
-    glutTimerFunc(1000//fps, timer, 0)
-    rotate3d()
-    printVertices()
+
+# def cameraTransform():
+#     global shader
+
 
 def rotate3d():
     global vertices, fps
@@ -237,12 +263,12 @@ def rotate3d():
         [-sin(rad), 0, cos(rad)]
     ]
     for i in range(0, len(vertices), 3):
-        local_vertices[i], local_vertices[i+1], local_vertices[i+2] = dot(m, vertices[i:i+3])
+        local_vertices[i], local_vertices[i + 1], local_vertices[i+2] = dot(m, vertices[i:i+3])
     vertices = deepcopy(local_vertices)
-    sleep(1//fps)
-
-def printVertices():
-    print(vertices[0], vertices[1], vertices[2])
+    glutPostRedisplay()
+    # sleep(1//fps)
+    # updateVBOData()
+    # sleep(1//fps)
 
 
 if __name__ == "__main__":
@@ -263,5 +289,6 @@ if __name__ == "__main__":
         elif (key == 'd' or key == 'D'):    # rotate right
             print('you pressed right')
         elif (key == 'q' or key == 'Q'):    # quit program
-            print('Good bye!')
+            print('Good bye!', end='')
             break
+        rotate3d()
