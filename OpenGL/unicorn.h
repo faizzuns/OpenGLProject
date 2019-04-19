@@ -1,4 +1,6 @@
-#pragma once
+#ifndef UNICORN_VAR
+#define UNICORN_VAR
+
 float vertices[] = {
 	-0.337f, 0.032f, 0.0f,	0.391f, 0.438f, 0.803f,
 	-0.282f, 0.021f, 0.0f,	0.817f, 0.71f, 0.061f,
@@ -497,3 +499,5 @@ float vertices[] = {
 	-0.001f, -0.294f, 0.0f,	0.056f, 0.799f, 0.678f,
 
 };
+
+#endif
