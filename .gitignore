@@ -1,3 +1,6 @@
 .vscode/
 main.o
 main.exe
+
+OpenGL/.vs
+OpenGL/Debug
