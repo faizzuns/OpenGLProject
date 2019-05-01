@@ -134,7 +134,11 @@ int main()
     
     // load models
     // -----------
+<<<<<<< HEAD
     Model ourModel("model/Audi_R8_2017.obj");
+=======
+    Model ourModel("model/bmw.obj");
+>>>>>>> 3eebb74e7c336d368526126bb34c165d2b1f8335
 
     int width, height, nrChannels;
     stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
