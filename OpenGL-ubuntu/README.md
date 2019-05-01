@@ -2,7 +2,9 @@
 
 Tested in Ubuntu 17.04
 
-## Install Dependencies (GLFW)
+## Install Dependencies
+
+### GLFW
 
 1. Download GLFW **source package** from [here](https://www.glfw.org/download.html)
 
@@ -25,6 +27,10 @@ or
 5. `make` (may require `sudo`)
 
 6. `make install` (may require `sudo`)
+
+### GLAD
+
+1. `python install glad`
 
 ## How to run
 
