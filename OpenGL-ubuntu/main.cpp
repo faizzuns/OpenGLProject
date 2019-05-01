@@ -39,8 +39,8 @@ unsigned int VBO, VAO, texture;
 //	 0.45f, 0.5f, 0.0f,		1.0f, 0.0f, 1.0f  // top 
 //};
 int vertexCount = sizeof(vertices) / (8 * sizeof(float));
-float rotationAngle = 0.0f;
-
+float rotationAngle_Y = 0.0f;
+float rotationAngle_X = 0.0f;
 
 int main()
 {
@@ -70,6 +70,10 @@ int main()
 		std::cout << "Failed to initialize GLAD" << std::endl;
 		return -1;
 	}
+
+	// configure global opengl state
+    // -----------------------------
+    glEnable(GL_DEPTH_TEST);
 
 	// build and compile our shader program
 	// ------------------------------------
@@ -177,7 +181,7 @@ void renderLoop(Shader shader)
 		// render
 		// ------
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// bind Texture
         glBindTexture(GL_TEXTURE_2D, texture);
@@ -186,7 +190,8 @@ void renderLoop(Shader shader)
         glm::mat4 transform = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
         // transform = glm::translate(transform, glm::vec3(0.5f, -0.5f, 0.0f));
 		// trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));
-        transform = glm::rotate(transform, rotationAngle, glm::vec3(0.0f, 1.0f, 0.0f));
+        transform = glm::rotate(transform, rotationAngle_Y, glm::vec3(0.0f, 1.0f, 0.0f));
+		transform = glm::rotate(transform, rotationAngle_X, glm::vec3(1.0f, 0.0f, 0.0f));
 
 		// draw our polygons
 		shader.use();
@@ -213,12 +218,17 @@ void processInput(GLFWwindow *window)
 		glfwSetWindowShouldClose(window, true);
 	} else if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS
 				|| glfwGetKey(window, GLFW_KEY_A) == GLFW_REPEAT) {
-		rotationAngle -= 0.01f;
+		rotationAngle_Y += 0.01f;
 	} else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS
 				|| glfwGetKey(window, GLFW_KEY_D) == GLFW_REPEAT) {
-		rotationAngle += 0.01f;
+		rotationAngle_Y -= 0.01f;
+	} else if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS
+				|| glfwGetKey(window, GLFW_KEY_W) == GLFW_REPEAT) {
+		rotationAngle_X -= 0.01f;
+	} else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS
+				|| glfwGetKey(window, GLFW_KEY_S) == GLFW_REPEAT) {
+		rotationAngle_X += 0.01f;
 	}
-	
 }
 
 
