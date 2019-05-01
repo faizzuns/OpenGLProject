@@ -3,7 +3,8 @@
 #include <iostream>
 #include "Shader.h"
 // #include "unicorn.h"
-#include "sample.h"
+// #include "sample.h"
+#include "car.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
