@@ -1,6 +1,11 @@
 #ifndef SHADER_H
 #define SHADER_H
 
+/*
+ * Reference:
+ * https://learnopengl.com/code_viewer_gh.php?code=includes/learnopengl/shader.h
+ */
+
 #include <glad/glad.h>
 
 #include <string>
