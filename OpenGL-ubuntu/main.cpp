@@ -39,6 +39,7 @@ unsigned int VBO, VAO, texture;
 //	 0.45f, 0.5f, 0.0f,		1.0f, 0.0f, 1.0f  // top 
 //};
 int vertexCount = sizeof(vertices) / (8 * sizeof(float));
+float rotationAngle = 0.0f;
 
 
 int main()
@@ -185,7 +186,7 @@ void renderLoop(Shader shader)
         glm::mat4 transform = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
         // transform = glm::translate(transform, glm::vec3(0.5f, -0.5f, 0.0f));
 		// trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));
-        transform = glm::rotate(transform, (float)glfwGetTime(), glm::vec3(0.0f, 1.0f, 0.0f));
+        transform = glm::rotate(transform, rotationAngle, glm::vec3(0.0f, 1.0f, 0.0f));
 
 		// draw our polygons
 		shader.use();
@@ -208,8 +209,16 @@ void renderLoop(Shader shader)
 // ---------------------------------------------------------------------------------------------------------
 void processInput(GLFWwindow *window)
 {
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, true);
+	} else if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS
+				|| glfwGetKey(window, GLFW_KEY_A) == GLFW_REPEAT) {
+		rotationAngle -= 0.01f;
+	} else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS
+				|| glfwGetKey(window, GLFW_KEY_D) == GLFW_REPEAT) {
+		rotationAngle += 0.01f;
+	}
+	
 }
 
 
