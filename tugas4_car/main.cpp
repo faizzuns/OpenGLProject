@@ -27,7 +27,7 @@ void loadAndCreateTexture();
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
-// camera
+// cameraNT, 
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
@@ -131,14 +131,11 @@ int main()
     Shader sunShader("shaders/sun.vs","shaders/sun.fs");
 	Shader particleShader("shaders/particle.vs", "shaders/particle.fs");
 
-    
+    cout << "before load" << endl;
     // load models
     // -----------
-<<<<<<< HEAD
-    Model ourModel("model/Audi_R8_2017.obj");
-=======
     Model ourModel("model/bmw.obj");
->>>>>>> 3eebb74e7c336d368526126bb34c165d2b1f8335
+    cout << "after load" << endl;
 
     int width, height, nrChannels;
     stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
@@ -234,12 +231,12 @@ int main()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
     glEnableVertexAttribArray(0);
 
-    glm::vec4 originSmoke = glm::vec4(0.85, 0.25, 0.0, 0.0);
+    glm::vec4 originSmoke = glm::vec4(-1.7, 0.15, 0.0, 0.0);
     for (unsigned int i = 0; i < nr_particles; i++) {
         
-        float vx = 0.001f + ((rand() % 100) / 100.0) * (0.003f - 0.001f);
-        float vy = -0.001f + ((rand() % 100) / 100.0) * (0.001f + 0.001f);
-        float vz = -0.001f + ((rand() % 100) / 100.0) * (0.001f + 0.001f);
+        float vx = 0.001f + ((rand() % 100) / 100.0) * (0.002f);
+        float vy = -0.001f + ((rand() % 100) / 100.0) * (0.002f);
+        float vz = -0.001f + ((rand() % 100) / 100.0) * (0.002f);
         glm::vec4 speed = glm::vec4(vx, vy, vz, 0.0f);
         smokes.push_back(Smoke(originSmoke, speed, originSmoke, originSmoke + glm::vec4(0.3f)));
     }

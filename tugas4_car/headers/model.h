@@ -55,19 +55,26 @@ private:
     void loadModel(string const &path)
     {
         // read file via ASSIMP
+        cout << "check 1" << endl;
         Assimp::Importer importer;
+        cout << "check 2" << endl;
         const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
+        cout << "check 3" << endl;
         // check for errors
         if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) // if is Not Zero
         {
+            cout << "check 4" << endl;
             cout << "ERROR::ASSIMP:: " << importer.GetErrorString() << endl;
             return;
         }
+        cout << "check 5" << endl;
         // retrieve the directory path of the filepath
         directory = path.substr(0, path.find_last_of('/'));
 
+cout << "check 6" << endl;
         // process ASSIMP's root node recursively
         processNode(scene->mRootNode, scene);
+        cout << "check 7" << endl;
     }
 
     // processes a node in a recursive fashion. Processes each individual mesh located at the node and repeats this process on its children nodes (if any).
